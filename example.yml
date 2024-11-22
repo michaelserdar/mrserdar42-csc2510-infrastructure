@@ -1,0 +1,54 @@
+---
+- hosts: all 
+  become: no  
+  become_method: sudo 
+
+
+- name: Install Python and Apache2
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Install Python 
+    package:
+      name: python3
+      state: present
+
+
+  - name: Install Apache2
+    package:
+      name: apache2
+      state: present
+
+
+  - name: Copy apache files 
+    ansible.builtin.copy:
+      src: /home/chefmichaelserdar/mrserdar42-csc2510-infrastructure/files/config/apache2.conf
+      dest: /etc/apache2/apache2.conf
+      owner: 644
+      group: 644
+      mode: 0644
+
+  - name: Copy index files 
+    ansible.builtin.copy:
+      src: /home/chefmichaelserdar/mrserdar42-csc2510-infrastructure/site/index.html
+      dest: /var/www/html/index.html
+      owner: 644
+      group: 644
+      mode: 0644
+
+
+  - name: Create a symbolic link
+    ansible.builtin.file:
+      src: /etc/apache2/mods-available/headers.load 
+      dest: /etc/apache2/mods-enabled/headers.load
+      owner: 644
+      group: 644
+      state: link
+
+
+  - name: restart apache
+    service: 
+        name: apache2
+        state: restarted 
+
